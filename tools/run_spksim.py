@@ -1,0 +1,91 @@
+import argparse
+from pathlib import Path
+
+import numpy as np
+import soundfile as sf
+import soxr
+import torch
+from espnet2.bin.spk_inference import Speech2Embedding
+from tqdm import tqdm
+
+METRIC = "SpeakerSimilarity"
+TARGET_FS = 16000
+
+#python tools/run_spksim.py --ref_dir /home/wz1023/Eval_SE/testset/clean --enh_dir /home/wz1023/Eval_SE/testset/OMLSA --output_dir /home/wz1023/Eval_SE/results/OMLSA/spksim --device cpu
+
+def speaker_similarity_metric(model, ref, inf, fs=16000):
+    if fs != TARGET_FS:
+        ref = soxr.resample(ref, fs, TARGET_FS)
+        inf = soxr.resample(inf, fs, TARGET_FS)
+    with torch.no_grad():
+        ref_emb = model(ref)
+        inf_emb = model(inf)
+        similarity = torch.cosine_similarity(ref_emb, inf_emb, dim=-1).item()
+    return similarity
+
+
+def load_files(dir_path):
+    files = {}
+    for f in Path(dir_path).glob("*.wav"):
+        files[f.stem] = f
+    for f in Path(dir_path).glob("*.flac"):
+        files[f.stem] = f
+    return files
+
+
+def main(args):
+    device = args.device
+    if device == "cuda" and not torch.cuda.is_available():
+        print("CUDA not available, fallback to CPU", flush=True)
+        device = "cpu"
+
+    model = Speech2Embedding.from_pretrained(
+        model_tag="espnet/voxcelebs12_rawnet3", device=device
+    )
+    model.spk_model.eval()
+
+    ref_files = load_files(args.ref_dir)
+    enh_files = load_files(args.enh_dir)
+
+    outdir = Path(args.output_dir)
+    outdir.mkdir(parents=True, exist_ok=True)
+
+    scores = {}
+    with (outdir / f"{METRIC}.scp").open("w") as w:
+        for uid, enh_path in tqdm(sorted(enh_files.items()), desc=METRIC):
+            if uid not in ref_files:
+                print(f"ref not found for {uid}", flush=True)
+                continue
+            ref, fs = sf.read(str(ref_files[uid]), dtype="float32")
+            inf, fs2 = sf.read(str(enh_path), dtype="float32")
+            if fs != fs2:
+                print(f"fs mismatch {uid}: {fs} vs {fs2}", flush=True)
+                continue
+            if ref.ndim == 2:
+                ref = ref[:, 0]
+            if inf.ndim == 2:
+                inf = inf[:, 0]
+            min_len = min(len(ref), len(inf))
+            ref = ref[:min_len]
+            inf = inf[:min_len]
+            try:
+                score = speaker_similarity_metric(model, ref, inf, fs=fs)
+            except Exception as e:
+                print(f"{uid} failed: {e}", flush=True)
+                score = float("nan")
+            scores[uid] = score
+            w.write(f"{uid} {score}\n")
+
+    with (outdir / "RESULTS.txt").open("w") as w:
+        w.write(f"{METRIC}: {np.nanmean(list(scores.values())):.4f}\n")
+    print(f"Results -> {outdir / 'RESULTS.txt'}", flush=True)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--ref_dir", type=str, required=True, help="Clean audio dir")
+    parser.add_argument("--enh_dir", type=str, required=True, help="Enhanced audio dir")
+    parser.add_argument("--output_dir", type=str, required=True)
+    parser.add_argument("--device", type=str, default="cuda")
+    args = parser.parse_args()
+    main(args)
