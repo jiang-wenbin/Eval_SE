@@ -1,3 +1,7 @@
+## Predictive and Generative Modeling for Monaural Speech Enhancement: A Unified Survey
+
+Comparison of representative SE methods across predictive, generative, and hybrid paradigms on VoiceBank + DEMAND dataset.
+
 [OMLSA] Noise spectrum estimation in adverse environments: Improved minima controlled recursive averaging https://doi.org/10.1109/tsa.2003.811544
 
 [RNNoise] A Hybrid DSP/Deep Learning Approach to Real-Time Full-Band Speech Enhancement https://ieeexplore.ieee.org/document/8547084/
