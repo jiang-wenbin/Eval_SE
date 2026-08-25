@@ -56,6 +56,10 @@ Comparison of representative SE methods across predictive, generative, and hybri
 
 [VoiceFixer] VoiceFixer: A Unified Framework for High-Fidelity Speech Restoration https://www.isca-archive.org/interspeech_2022/liu22y_interspeech.html
 
+[TF-GridNet] TF-GridNet: Making Time-Frequency Domain Models Great Again for Monaural Speaker Separation https://ieeexplore.ieee.org/document/10094992
+
+[BSRNN] High Fidelity Speech Enhancement with Band-split RNN https://www.isca-archive.org/interspeech_2023/yu23b_interspeech.html
+
 [BBED] Reducing the Prior Mismatch of Stochastic Differential Equations for Diffusion-based Speech Enhancement https://www.isca-archive.org/interspeech_2023/lay23_interspeech.html
 
 [HiFi++] HiFi++: a unified framework for bandwidth extension and speech enhancement https://ieeexplore.ieee.org/document/10097255/
