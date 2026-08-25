@@ -68,9 +68,9 @@ Comparison of representative SE methods across predictive, generative, and hybri
 
 [AnyEnhance] AnyEnhance: A Unified Generative Model With Prompt-Guidance and Self-Critic for Voice Enhancement https://ieeexplore.ieee.org/document/11095999/
 
-[FlowSE-Freq] FlowSE: Flow Matching-based Speech Enhancement https://ieeexplore.ieee.org/document/10888274/
+[FlowSE-TF] FlowSE: Flow Matching-based Speech Enhancement https://ieeexplore.ieee.org/document/10888274/
 
-[FlowSE-Vocoder] FlowSE: Efficient and High-Quality Speech Enhancement via Flow Matching https://www.isca-archive.org/interspeech_2025/wang25s_interspeech.html
+[FlowSE-Vocos] FlowSE: Efficient and High-Quality Speech Enhancement via Flow Matching https://www.isca-archive.org/interspeech_2025/wang25s_interspeech.html
 
 [ROSE-CD] Robust One-Step Speech Enhancement via Consistency Distillation https://ieeexplore.ieee.org/document/11230988/
 
