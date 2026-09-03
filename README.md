@@ -1,4 +1,4 @@
-## Predictive and Generative Modeling for Monaural Speech Enhancement: A Unified Survey
+## A Unified Survey of Monaural Speech Enhancement: Predictive, Generative, and Beyond
 
 Comparison of representative SE methods across predictive, generative, and hybrid paradigms on VoiceBank + DEMAND dataset.
 
