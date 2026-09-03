@@ -7,7 +7,7 @@ import soundfile as sf
 from tqdm import tqdm
 
 '''
-python tools/calculate_SI-SNR.py --clean_folder wav/clean --enhanced_folder wav/noisy
+python tools/calculate_SI-SNR.py --clean_folder testset/clean --enhanced_folder testset/noisy
 '''
 
 def calculate_si_snr(enhanced_file, clean_file):

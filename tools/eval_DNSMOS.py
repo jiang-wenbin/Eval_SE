@@ -10,7 +10,6 @@ import onnxruntime as ort
 import pandas as pd
 import soundfile as sf
 from tqdm import tqdm
-from wvmos import get_wvmos
 
 '''
 https://github.com/microsoft/DNS-Challenge/blob/master/DNSMOS/dnsmos_local.py
@@ -112,6 +111,7 @@ def main(args):
     compute_score = ComputeScore(primary_model_path, p808_model_path)
 
     clips = glob.glob(os.path.join(args.testset_dir, "*.wav"))
+    clips.extend(glob.glob(os.path.join(args.testset_dir, "*.flac")))
     is_personalized_eval = args.personalized_MOS
     desired_fs = SAMPLING_RATE
     
@@ -136,17 +136,6 @@ def main(args):
 
     df = pd.DataFrame(rows)
 
-    # WVMOS evaluation (serial to avoid thread-safety issues with wav2vec2 model)
-    wvmos_model = get_wvmos(cuda=True)
-    wvmos_scores = []
-    for row in rows:
-        try:
-            wvmos_scores.append(wvmos_model.calculate_one(row['filename']))
-        except Exception as exc:
-            print(f'{row["filename"]} generated an exception for WVMOS: {exc}')
-            wvmos_scores.append(float('nan'))
-    df['WVMOS'] = wvmos_scores
-
     mean_OVRL_raw = df['OVRL_raw'].mean()
     mean_SIG_raw = df['SIG_raw'].mean()
     mean_BAK_raw = df['BAK_raw'].mean()
@@ -154,8 +143,6 @@ def main(args):
     mean_SIG = df['SIG'].mean()
     mean_BAK = df['BAK'].mean()
     mean_P808_MOS = df['P808_MOS'].mean()
-    mean_WVMOS = df['WVMOS'].mean()
-
     # print(f"Average OVRL_raw: {mean_OVRL_raw}")
     # print(f"Average SIG_raw: {mean_SIG_raw}")
     # print(f"Average BAK_raw: {mean_BAK_raw}")
@@ -171,8 +158,7 @@ def main(args):
         'OVRL': round(mean_OVRL, 3),
         'SIG' : round(mean_SIG, 3),
         'BAK' : round(mean_BAK, 3),
-        'P808_MOS' : round(mean_P808_MOS, 3),
-        'WVMOS' : round(mean_WVMOS, 3)
+        'P808_MOS' : round(mean_P808_MOS, 3)
     }
     print(result)
 

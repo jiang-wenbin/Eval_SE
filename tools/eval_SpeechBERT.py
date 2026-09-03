@@ -5,23 +5,23 @@ import numpy as np
 import soundfile as sf
 import soxr
 import torch
-from espnet2.bin.spk_inference import Speech2Embedding
+from discrete_speech_metrics import SpeechBERTScore as SBS
 from tqdm import tqdm
 
-METRIC = "SpeakerSimilarity"
+METRIC = "SpeechBERTScore"
 TARGET_FS = 16000
 
-#python tools/run_spksim.py --ref_dir /home/wz1023/Eval_SE/testset/clean --enh_dir /home/wz1023/Eval_SE/testset/OMLSA --output_dir /home/wz1023/Eval_SE/results/OMLSA/spksim --device cpu
+#python tools/run_speechbert.py --ref_dir testset/clean --enh_dir testset/OMLSA --output_dir results/OMLSA/speechbert
 
-def speaker_similarity_metric(model, ref, inf, fs=16000):
-    if fs != TARGET_FS:
-        ref = soxr.resample(ref, fs, TARGET_FS)
-        inf = soxr.resample(inf, fs, TARGET_FS)
-    with torch.no_grad():
-        ref_emb = model(ref)
-        inf_emb = model(inf)
-        similarity = torch.cosine_similarity(ref_emb, inf_emb, dim=-1).item()
-    return similarity
+class SpeechBERTScoreModel:
+    def __init__(self, device="cpu"):
+        self.speech_bert_score = SBS(
+            sr=TARGET_FS, model_type="mhubert-147", layer=8, use_gpu="cuda" in device
+        )
+
+    def __call__(self, reference, sample):
+        precision, recall, f1_score = self.speech_bert_score.score(reference, sample)
+        return precision, recall, f1_score
 
 
 def load_files(dir_path):
@@ -39,10 +39,8 @@ def main(args):
         print("CUDA not available, fallback to CPU", flush=True)
         device = "cpu"
 
-    model = Speech2Embedding.from_pretrained(
-        model_tag="espnet/voxcelebs12_rawnet3", device=device
-    )
-    model.spk_model.eval()
+    model = SpeechBERTScoreModel(device=device)
+    model.speech_bert_score.model.eval()
 
     ref_files = load_files(args.ref_dir)
     enh_files = load_files(args.enh_dir)
@@ -65,11 +63,15 @@ def main(args):
                 ref = ref[:, 0]
             if inf.ndim == 2:
                 inf = inf[:, 0]
+            if fs != TARGET_FS:
+                ref = soxr.resample(ref, fs, TARGET_FS)
+                inf = soxr.resample(inf, fs, TARGET_FS)
             min_len = min(len(ref), len(inf))
             ref = ref[:min_len]
             inf = inf[:min_len]
             try:
-                score = speaker_similarity_metric(model, ref, inf, fs=fs)
+                with torch.no_grad():
+                    score = model(ref, inf)[0]
             except Exception as e:
                 print(f"{uid} failed: {e}", flush=True)
                 score = float("nan")

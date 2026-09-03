@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 METRIC = "UTMOS"
 
-#python tools/run_utmos.py --enh_dir /home/wz1023/Eval_SE/testset/OMLSA --output_dir /home/wz1023/Eval_SE/results/OMLSA/utmos
+#python tools/run_utmos.py --enh_dir testset/OMLSA --output_dir results/OMLSA/utmos
 
 def utmos_metric(model, audio_path):
     wave, sr = librosa.load(audio_path, sr=None, mono=True)
