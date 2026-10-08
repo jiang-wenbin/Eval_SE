@@ -83,3 +83,5 @@ Comparison of representative SE methods across predictive, generative, and hybri
 [[PGUSE]](testset/PGUSE) A Composite Predictive-Generative Approach to Monaural Universal Speech Enhancement https://ieeexplore.ieee.org/document/11027560/
 
 [[HyFlowSE]](testset/HyFlowSE) HyFlowSE: Hybrid End-To-End Flow-Matching Speech Enhancement via Generative-Discriminative Learning https://ieeexplore.ieee.org/abstract/document/11464634
+
+[[SIPS]](testset/SIPS) Predictive-Generative Drift Decomposition for Speech Enhancement and Separation https://arxiv.org/abs/2605.06189
