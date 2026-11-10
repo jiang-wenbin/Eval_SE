@@ -1,5 +1,11 @@
 ## A Unified Survey of Monaural Speech Enhancement: Predictive, Generative, and Beyond
 
+**2026.11.10 Update:**
+
+The paper is now available online: https://ieeexplore.ieee.org/document/11782818
+
+---
+
 Comparison of representative SE methods across predictive, generative, and hybrid paradigms on VoiceBank + DEMAND dataset.
 
 [[OMLSA]](testset/OMLSA) Noise spectrum estimation in adverse environments: Improved minima controlled recursive averaging https://doi.org/10.1109/tsa.2003.811544
